@@ -38,4 +38,10 @@ public class GameController : MonoBehaviour
             enemy.transform.localPosition = pos;
         }
     }
+    public void killEnemy() {
+        numberOfEnemiesKilled += 1;
+    }
+    public void touchEnemy() {
+        numberOfEnemiesTouched += 1;
+    }
 }

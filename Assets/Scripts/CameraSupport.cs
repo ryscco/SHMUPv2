@@ -18,7 +18,7 @@ public class CameraSupport : MonoBehaviour
         c.z = 0.0f;
         mWorldBound.center = c;
         mWorldBound.size = new Vector3(sizeX, sizeY, 1f);
-        Debug.Log("mWorldBound: " + mWorldBound);
+        // Debug.Log("mWorldBound: " + mWorldBound);
     }
     void Update()
     {

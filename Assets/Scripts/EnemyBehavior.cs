@@ -5,13 +5,14 @@ using UnityEngine;
 public class EnemyBehavior : MonoBehaviour
 {
     private int hitsRemaining = 4;
-    public Animator enemyAnimator;
-    public GameController gameController;
+    public Animator enemyAnimator = null;
+    public GameController gameController = null;
     Color color;
     void Start()
     {
         enemyAnimator = GetComponent<Animator>();
         color = GetComponent<SpriteRenderer>().material.color;
+        gameController = FindObjectOfType<GameController>();
     }
     void Update()
     {
@@ -30,7 +31,7 @@ public class EnemyBehavior : MonoBehaviour
         {
             enemyAnimator.SetBool("killed", true);
             Destroy(gameObject, 0.75f);
-            gameController.numberOfEnemiesTouched += 1;
+            gameController.touchEnemy();
         }
         if (other.gameObject.tag == "projectile")
         {
@@ -45,6 +46,6 @@ public class EnemyBehavior : MonoBehaviour
     }
     private void OnDestroy()
     {
-        // gameController.numberOfEnemiesKilled += 1;
+        gameController.killEnemy();
     }
 }

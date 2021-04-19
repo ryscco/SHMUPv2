@@ -25,16 +25,4 @@ public class playerProjectileBehavior : MonoBehaviour
     {
         Destroy(gameObject);
     }
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.gameObject.tag == "Enemy")
-        {
-            Transform pos = other.gameObject.transform;
-            if (gameObject.tag == "missile")
-            {
-                Instantiate(explodePrefab, pos);
-            }
-            Destroy(gameObject);
-        }
-    }
 }
