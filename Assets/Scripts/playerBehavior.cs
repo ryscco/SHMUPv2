@@ -19,7 +19,7 @@ public class playerBehavior : MonoBehaviour
     private bool shootCooldownToggleMissile = false;
     private float nextMissileFireTime = 0;
     public bool playerHasMissile = false;
-    // private GameController theGameController = null;
+    private GameController theGameController = null;
     private float spriteSizeX = 0;
     private float spriteSizeY = 0;
     void Start()
@@ -27,17 +27,19 @@ public class playerBehavior : MonoBehaviour
         playerAnimator = GetComponent<Animator>();
         playerRB2D = GetComponent<Rigidbody2D>();
         bulletSpawnPoint.y = 0.4f;
-        // theGameController = FindObjectOfType<GameController>();
+        theGameController = FindObjectOfType<GameController>();
         spriteSizeX = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
         spriteSizeY = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
     }
     void Update()
     {
         // Randomize which side missiles spawn from
-        if (Random.value < 0.5f) {
+        if (Random.value < 0.5f)
+        {
             missileSpawnPoint.x = -0.2f;
         }
-        else {
+        else
+        {
             missileSpawnPoint.x = 0.2f;
         }
 
@@ -133,17 +135,25 @@ public class playerBehavior : MonoBehaviour
             }
         }
         // Constrain missile fire rate & check existence
-        if (playerHasMissile && Time.time > nextMissileFireTime) {
-            if (shootCooldownToggleMissile) {
+        if (playerHasMissile && Time.time > nextMissileFireTime)
+        {
+            if (shootCooldownToggleMissile)
+            {
                 shootCooldownToggleMissile = false;
             }
-            if (Input.GetKeyDown(KeyCode.B)) {
+            if (Input.GetKeyDown(KeyCode.B))
+            {
                 GameObject missile = Instantiate(Resources.Load("Prefabs/playerMissile") as GameObject);
                 missile.transform.localPosition = transform.localPosition + missileSpawnPoint;
                 missile.transform.rotation = transform.rotation;
                 nextMissileFireTime = Time.time + shootMissleCooldownTime;
-                // playerHasMissile = false;
+                theGameController.shootMissile();
             }
+        }
+        // Test block for missile
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            theGameController.pickupMissile();
         }
         pos = CheckEdges(pos);
         transform.position = pos;
