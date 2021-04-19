@@ -4,41 +4,47 @@ using UnityEngine;
 
 public class EnemyBehavior : MonoBehaviour
 {
-    private float rotateSpeed = 135;
     private int hitsRemaining = 4;
+    public Animator enemyAnimator;
+    public GameController gameController;
     Color color;
     void Start()
     {
+        enemyAnimator = GetComponent<Animator>();
         color = GetComponent<SpriteRenderer>().material.color;
     }
     void Update()
     {
-        transform.Rotate(transform.forward, rotateSpeed * Time.smoothDeltaTime);
         gameObject.GetComponent<SpriteRenderer>().material.color = color;
         if (hitsRemaining < 1)
         {
-            Destroy(gameObject);
-            GameObject.FindObjectOfType<GameController>().numberOfEnemiesKilled += 1;
+            color.a = 1f;
+            gameObject.GetComponent<SpriteRenderer>().material.color = color;
+            enemyAnimator.SetBool("killed", true);
+            Destroy(gameObject, 0.75f);
         }
-    }
-    public void setRotateSpeed(float num)
-    {
-        rotateSpeed *= num;
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.name == "Player")
+        if (other.gameObject.name == "playerShip")
         {
-            Destroy(gameObject);
-            GameObject.FindObjectOfType<GameController>().numberOfEnemiesKilled += 1;
-            GameObject.FindObjectOfType<GameController>().numberOfEnemiesTouched += 1;
-
+            enemyAnimator.SetBool("killed", true);
+            Destroy(gameObject, 0.75f);
+            gameController.numberOfEnemiesTouched += 1;
         }
-        if (other.gameObject.tag == "Projectile")
+        if (other.gameObject.tag == "projectile")
         {
-            Destroy(other.gameObject);
             --hitsRemaining;
             color.a = GetComponent<SpriteRenderer>().material.color.a * 0.8f;
         }
+        if (other.gameObject.tag == "missile")
+        {
+            enemyAnimator.SetBool("killed", true);
+            Destroy(gameObject, 0.75f);
+        }
+    }
+    private void OnDestroy()
+    {
+        // gameController.numberOfEnemiesKilled += 1;
     }
 }

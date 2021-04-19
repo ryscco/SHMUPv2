@@ -142,7 +142,7 @@ public class playerBehavior : MonoBehaviour
                 missile.transform.localPosition = transform.localPosition + missileSpawnPoint;
                 missile.transform.rotation = transform.rotation;
                 nextMissileFireTime = Time.time + shootMissleCooldownTime;
-                playerHasMissile = false;
+                // playerHasMissile = false;
             }
         }
         pos = CheckEdges(pos);

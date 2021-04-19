@@ -15,11 +15,11 @@ public class GameController : MonoBehaviour
     void Update()
     {
         numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
-        if (Input.GetKey(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C))
         {
-            Cursor.visible = true;
+            Cursor.visible = !(Cursor.visible);
         }
-        if (Input.GetKey(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -29,12 +29,11 @@ public class GameController : MonoBehaviour
         }
         if (numberOfEnemies < maxEnemies)
         {
-            // CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
+            CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
             GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
-            enemy.GetComponent<EnemyBehavior>().setRotateSpeed(Random.value);
             Vector3 pos;
-            // pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
-            // pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
+            pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
+            pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
             pos.z = 0;
             enemy.transform.localPosition = pos;
         }
