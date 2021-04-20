@@ -16,15 +16,25 @@ public class GameController : MonoBehaviour
     private float pickupChance;
     private float nextPickupTime = 0f;
     private float pickupCooldownTime = 15f;
-    GameObject bButton, player;
-    GameObject reloadButton;
+    GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton;
     void Start()
     {
+        Cursor.visible = true;
+
         bButton = GameObject.Find("bButton");
         player = GameObject.Find("playerShip");
-        bButton.SetActive(false);
-        Cursor.visible = false;
         reloadButton = GameObject.Find("reloadButton");
+        quitButton = GameObject.Find("quitButton");
+        gameOverText = GameObject.Find("gameOverText");
+        titleText = GameObject.Find("titleText");
+        startButton = GameObject.Find("startButton");
+
+        player.SetActive(false);
+        bButton.SetActive(false);
+        reloadButton.SetActive(false);
+        quitButton.SetActive(false);
+        gameOverText.SetActive(false);
+
         instantiateWaypoints();
     }
     private void FixedUpdate()
@@ -39,42 +49,51 @@ public class GameController : MonoBehaviour
     }
     void Update()
     {
-        if (playerLives <= 0)
+        if (player != null && player.activeSelf)
         {
-            playerDie();
+            if (playerLives <= 0)
+            {
+                playerDie();
+            }
+            numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
+            numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                Cursor.visible = !(Cursor.visible);
+            }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                QuitGame();
+            }
+            // Instantiate enemies
+            if (numberOfEnemies < maxEnemies)
+            {
+                CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
+                GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
+                Vector3 pos;
+                pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
+                pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
+                pos.z = 0;
+                enemy.transform.localPosition = pos;
+            }
+            // Test block to spawn pickup
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                instantiatePickup();
+            }
         }
-        numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
-        numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
-        if (Input.GetKeyDown(KeyCode.C))
+        // Title/GameOver button behavior
+        if (startButton.activeSelf)
         {
-            Cursor.visible = !(Cursor.visible);
+            startButton.GetComponent<Button>().onClick.AddListener(StartGame);
         }
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (reloadButton.activeSelf)
         {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
-        }
-        // Instantiate enemies
-        if (numberOfEnemies < maxEnemies)
-        {
-            CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
-            GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
-            Vector3 pos;
-            pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
-            pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
-            pos.z = 0;
-            enemy.transform.localPosition = pos;
-        }
-        // Test block to spawn pickup
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            instantiatePickup();
-        }
-        if (reloadButton.activeSelf) {
             reloadButton.GetComponent<Button>().onClick.AddListener(ReloadGame);
+        }
+        if (quitButton.activeSelf)
+        {
+            quitButton.GetComponent<Button>().onClick.AddListener(QuitGame);
         }
     }
     public void killEnemy()
@@ -133,11 +152,28 @@ public class GameController : MonoBehaviour
     public void playerDie()
     {
         player.gameObject.GetComponent<playerBehavior>().playerExplode();
-        Destroy(player,0.75f);
+        Destroy(player, 0.75f);
         Cursor.visible = true;
         reloadButton.SetActive(true);
+        quitButton.SetActive(true);
+        gameOverText.SetActive(true);
     }
-    private void ReloadGame() {
+    private void ReloadGame()
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    private void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+    }
+    private void StartGame()
+    {
+        player.SetActive(true);
+        titleText.SetActive(false);
+        Cursor.visible = false;
     }
 }

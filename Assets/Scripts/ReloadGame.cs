@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class Restart : MonoBehaviour
+public class ReloadGame : MonoBehaviour
 {
 
     public void RestartGame()
     {
-        ; // loads current scene
+         // loads current scene
     }
 
 }
