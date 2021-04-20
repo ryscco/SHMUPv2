@@ -40,8 +40,7 @@ public class GameController : MonoBehaviour
     private void FixedUpdate()
     {
         pickupChance = Random.Range(0.0f, 10.0f);
-        if (pickupChance > 9.0f && !(GameObject.FindGameObjectWithTag("pickup"))
-        && Time.time > nextPickupTime)
+        if (pickupChance > 9.0f && !(GameObject.FindGameObjectWithTag("pickup")) && Time.time > nextPickupTime && gameRunning)
         {
             instantiatePickup();
             nextPickupTime = Time.time + pickupCooldownTime;
@@ -113,6 +112,7 @@ public class GameController : MonoBehaviour
     public void givePlayerLife()
     {
         playerLives += 1;
+        player.GetComponent<playerBehavior>().playerHealthTopOff();
     }
     public void pickupMissile()
     {

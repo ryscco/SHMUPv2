@@ -208,4 +208,8 @@ public class playerBehavior : MonoBehaviour
     {
         playerAnimator.SetBool("killed", true);
     }
+    public void playerHealthTopOff()
+    {
+        playerHealthCurrent = playerHealthMax;
+    }
 }

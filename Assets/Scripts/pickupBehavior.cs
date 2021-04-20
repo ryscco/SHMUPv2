@@ -28,7 +28,7 @@ public class pickupBehavior : MonoBehaviour
             {
                 theGameController.pickupMissile();
             }
-            else if (pickupDetermine > 0.65f && pickupDetermine <= 0.95f)
+            else if (pickupDetermine > 0.65f && pickupDetermine <= 0.9f)
             {
                 theGameController.pickupShield();
             }
