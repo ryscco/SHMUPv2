@@ -140,6 +140,11 @@ public class GameController : MonoBehaviour
             pos.z = 0;
             waypoint.transform.localPosition = pos;
         }
+        string[] wpNames = {"A", "B", "C", "D", "E", "F"};
+        GameObject[] wpArray = GameObject.FindGameObjectsWithTag("waypoint");
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("waypoint").Length; i++) {
+            wpArray[i].name = "waypoint" + wpNames[i];
+        }
     }
     public void instantiatePickup()
     {
@@ -177,11 +182,23 @@ public class GameController : MonoBehaviour
     {
         player.SetActive(true);
         titleText.SetActive(false);
+        controlsPanel.SetActive(false);
         Cursor.visible = false;
         gameRunning = true;
     }
     private void ShowControls()
     {
         controlsPanel.SetActive(!controlsPanel.activeSelf);
+    }
+    public void relocateWaypoint(Transform xform, string name)
+    {
+        CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
+        GameObject waypoint = Instantiate(Resources.Load("Prefabs/waypoint") as GameObject);
+        Vector3 pos;
+        pos.x = (xform.position.x + Random.Range(-0.15f,0.15f));
+        pos.y = (xform.position.y + Random.Range(-0.15f,0.15f));
+        pos.z = 0;
+        waypoint.transform.localPosition = pos;
+        waypoint.name = name;
     }
 }

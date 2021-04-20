@@ -175,7 +175,7 @@ public class playerBehavior : MonoBehaviour
     }
     private Vector3 CheckEdges(Vector3 pos)
     {
-        if (pos.x < -6.3f)
+        if (pos.x < -6.93f)
         {
             pos.x = 6.3f;
         }
@@ -183,7 +183,7 @@ public class playerBehavior : MonoBehaviour
         {
             pos.y = -5.4f;
         }
-        if (pos.x > 6.3f)
+        if (pos.x > 6.93f)
         {
             pos.x = -6.3f;
         }

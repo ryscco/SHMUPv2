@@ -8,8 +8,18 @@ public class EnemyBehavior : MonoBehaviour
     public Animator enemyAnimator = null;
     public GameController gameController = null;
     Color color;
+    public char patrolType; // A (waypoints in order) or B (random waypoints)
     void Start()
     {
+        // Set patrol type on creation randomly between A and B
+        if (Random.value < 0.5f)
+        {
+            patrolType = 'A';
+        }
+        else
+        {
+            patrolType = 'B';
+        }
         enemyAnimator = GetComponent<Animator>();
         color = GetComponent<SpriteRenderer>().material.color;
         gameController = FindObjectOfType<GameController>();
