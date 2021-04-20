@@ -49,38 +49,35 @@ public class GameController : MonoBehaviour
     }
     void Update()
     {
-        if (player != null && player.activeSelf)
+        if (Input.GetKeyDown(KeyCode.C))
         {
-            if (playerLives <= 0)
-            {
-                playerDie();
-            }
-            numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
-            numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                Cursor.visible = !(Cursor.visible);
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                QuitGame();
-            }
-            // Instantiate enemies
-            if (numberOfEnemies < maxEnemies)
-            {
-                CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
-                GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
-                Vector3 pos;
-                pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
-                pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
-                pos.z = 0;
-                enemy.transform.localPosition = pos;
-            }
-            // Test block to spawn pickup
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                instantiatePickup();
-            }
+            Cursor.visible = !(Cursor.visible);
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            QuitGame();
+        }
+        if (playerLives <= 0)
+        {
+            playerDie();
+        }
+        numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
+        numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
+        // Instantiate enemies
+        if (numberOfEnemies < maxEnemies)
+        {
+            CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
+            GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
+            Vector3 pos;
+            pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
+            pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
+            pos.z = 0;
+            enemy.transform.localPosition = pos;
+        }
+        // Test block to spawn pickup
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            instantiatePickup();
         }
         // Title/GameOver button behavior
         if (startButton.activeSelf)
