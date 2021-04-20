@@ -8,6 +8,7 @@ TagManager:
   - missile
   - Enemy
   - waypoint
+  - pickup
   layers:
   - Default
   - TransparentFX

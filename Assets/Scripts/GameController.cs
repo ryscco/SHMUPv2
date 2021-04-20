@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -11,17 +13,36 @@ public class GameController : MonoBehaviour
     public int numberOfEnemiesKilled = 0;
     public int numberOfEnemiesTouched = 0;
     public int playerLives = 3;
+    private float pickupChance;
+    private float nextPickupTime = 0f;
+    private float pickupCooldownTime = 15f;
     GameObject bButton, player;
+    GameObject reloadButton;
     void Start()
     {
         bButton = GameObject.Find("bButton");
         player = GameObject.Find("playerShip");
         bButton.SetActive(false);
         Cursor.visible = false;
+        reloadButton = GameObject.Find("reloadButton");
         instantiateWaypoints();
+    }
+    private void FixedUpdate()
+    {
+        pickupChance = Random.Range(0.0f, 10.0f);
+        if (pickupChance > 9.0f && !(GameObject.FindGameObjectWithTag("pickup"))
+        && Time.time > nextPickupTime)
+        {
+            instantiatePickup();
+            nextPickupTime = Time.time + pickupCooldownTime;
+        }
     }
     void Update()
     {
+        if (playerLives <= 0)
+        {
+            playerDie();
+        }
         numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
         numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
         if (Input.GetKeyDown(KeyCode.C))
@@ -46,6 +67,14 @@ public class GameController : MonoBehaviour
             pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
             pos.z = 0;
             enemy.transform.localPosition = pos;
+        }
+        // Test block to spawn pickup
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            instantiatePickup();
+        }
+        if (reloadButton.activeSelf) {
+            reloadButton.GetComponent<Button>().onClick.AddListener(ReloadGame);
         }
     }
     public void killEnemy()
@@ -74,6 +103,10 @@ public class GameController : MonoBehaviour
         bButton.SetActive(false);
         player.gameObject.GetComponent<playerBehavior>().playerHasMissile = false;
     }
+    public void pickupShield()
+    {
+
+    }
     public void instantiateWaypoints()
     {
         for (int i = 0; i < maxWaypoints; i++)
@@ -86,5 +119,25 @@ public class GameController : MonoBehaviour
             pos.z = 0;
             waypoint.transform.localPosition = pos;
         }
+    }
+    public void instantiatePickup()
+    {
+        CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
+        GameObject pickup = Instantiate(Resources.Load("Prefabs/pickup") as GameObject);
+        Vector3 pos;
+        pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
+        pos.y = 5.4f;
+        pos.z = 0;
+        pickup.transform.localPosition = pos;
+    }
+    public void playerDie()
+    {
+        player.gameObject.GetComponent<playerBehavior>().playerExplode();
+        Destroy(player,0.75f);
+        Cursor.visible = true;
+        reloadButton.SetActive(true);
+    }
+    private void ReloadGame() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

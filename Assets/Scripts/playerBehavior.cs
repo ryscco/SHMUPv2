@@ -8,6 +8,8 @@ public class playerBehavior : MonoBehaviour
     public Rigidbody2D playerRB2D;
     public Vector3 bulletSpawnPoint;
     public Vector3 missileSpawnPoint;
+    public float playerHealthCurrent;
+    public float playerHealthMax = 10.0f;
     public float playerSpeed = 3.5f;
     public float maxPlayerSpeed = 8f;
     public float accelerationFactor = 0.02f;
@@ -30,6 +32,7 @@ public class playerBehavior : MonoBehaviour
         theGameController = FindObjectOfType<GameController>();
         spriteSizeX = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
         spriteSizeY = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
+        playerHealthCurrent = playerHealthMax;
     }
     void Update()
     {
@@ -46,7 +49,7 @@ public class playerBehavior : MonoBehaviour
         // Test block for explode animation
         if (Input.GetKeyDown(KeyCode.K))
         {
-            playerAnimator.SetBool("killed", true);
+            // playerAnimator.SetBool("killed", true);
         }
 
         // Toggle control scheme with M key
@@ -118,6 +121,7 @@ public class playerBehavior : MonoBehaviour
             {
                 playerSpeed -= accelerationFactor;
             }
+            pos = CheckEdges(pos);
         }
         // Constrain fire rate
         if (Time.time > nextFireTime)
@@ -155,7 +159,12 @@ public class playerBehavior : MonoBehaviour
         {
             theGameController.pickupMissile();
         }
-        pos = CheckEdges(pos);
+        if (playerHealthCurrent <= 0f)
+        {
+            theGameController.takePlayerLife();
+            playerHealthCurrent = playerHealthMax;
+        }
+        // Final update of position
         transform.position = pos;
     }
     private void FlipX()
@@ -183,5 +192,20 @@ public class playerBehavior : MonoBehaviour
             pos.y = 5.4f;
         }
         return pos;
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            playerHealthCurrent -= Random.Range(1.0f, 2.5f);
+        }
+        if (other.gameObject.tag == "waypoint")
+        {
+            playerHealthCurrent -= Random.Range(0.5f, 1.5f);
+        }
+    }
+    public void playerExplode()
+    {
+        playerAnimator.SetBool("killed", true);
     }
 }
