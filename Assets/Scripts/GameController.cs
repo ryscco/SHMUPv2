@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
+    private bool gameRunning;
     private int maxEnemies = 10;
     private int numberOfEnemies = 0;
     private int maxWaypoints = 6;
@@ -16,7 +17,7 @@ public class GameController : MonoBehaviour
     private float pickupChance;
     private float nextPickupTime = 0f;
     private float pickupCooldownTime = 15f;
-    GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton;
+    GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton, controlsPanel;
     void Start()
     {
         Cursor.visible = true;
@@ -28,14 +29,13 @@ public class GameController : MonoBehaviour
         gameOverText = GameObject.Find("gameOverText");
         titleText = GameObject.Find("titleText");
         startButton = GameObject.Find("startButton");
+        controlsPanel = GameObject.Find("controlsPanel");
 
         player.SetActive(false);
         bButton.SetActive(false);
         reloadButton.SetActive(false);
         quitButton.SetActive(false);
         gameOverText.SetActive(false);
-
-        instantiateWaypoints();
     }
     private void FixedUpdate()
     {
@@ -57,6 +57,10 @@ public class GameController : MonoBehaviour
         {
             QuitGame();
         }
+        if (Input.GetKeyDown(KeyCode.K) && gameRunning)
+        {
+            ShowControls();
+        }
         if (playerLives <= 0)
         {
             playerDie();
@@ -64,7 +68,7 @@ public class GameController : MonoBehaviour
         numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
         numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
         // Instantiate enemies
-        if (numberOfEnemies < maxEnemies)
+        if (numberOfEnemies < maxEnemies && gameRunning)
         {
             CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
             GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
@@ -83,6 +87,7 @@ public class GameController : MonoBehaviour
         if (startButton.activeSelf)
         {
             startButton.GetComponent<Button>().onClick.AddListener(StartGame);
+            startButton.GetComponent<Button>().onClick.AddListener(instantiateWaypoints);
         }
         if (reloadButton.activeSelf)
         {
@@ -125,7 +130,7 @@ public class GameController : MonoBehaviour
     }
     public void instantiateWaypoints()
     {
-        for (int i = 0; i < maxWaypoints; i++)
+        while (GameObject.FindGameObjectsWithTag("waypoint").Length < maxWaypoints)
         {
             CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
             GameObject waypoint = Instantiate(Resources.Load("Prefabs/waypoint") as GameObject);
@@ -154,6 +159,7 @@ public class GameController : MonoBehaviour
         reloadButton.SetActive(true);
         quitButton.SetActive(true);
         gameOverText.SetActive(true);
+        gameRunning = false;
     }
     private void ReloadGame()
     {
@@ -172,5 +178,10 @@ public class GameController : MonoBehaviour
         player.SetActive(true);
         titleText.SetActive(false);
         Cursor.visible = false;
+        gameRunning = true;
+    }
+    private void ShowControls()
+    {
+        controlsPanel.SetActive(!controlsPanel.activeSelf);
     }
 }
