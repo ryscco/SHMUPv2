@@ -46,4 +46,7 @@ public class pickupBehavior : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private void OnBecameInvisible() {
+        Destroy(gameObject);
+    }
 }

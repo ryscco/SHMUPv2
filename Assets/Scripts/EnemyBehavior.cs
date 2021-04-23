@@ -9,7 +9,7 @@ public class EnemyBehavior : MonoBehaviour
     public GameController gameController = null;
     Color color;
     public char patrolType; // A (waypoints in order) or B (random waypoints)
-    public float enemySpeed = 0.1f;
+    public float enemySpeed = 2.5f;
     GameObject[] wps;
     int wpIndex;
     float wpRadius;
@@ -64,6 +64,7 @@ public class EnemyBehavior : MonoBehaviour
         string n = other.gameObject.tag;
         if (n == "Player" || n == "missile" || n == "shield")
         {
+            enemySpeed = 0;
             enemyAnimator.SetBool("killed", true);
             Destroy(gameObject, 0.75f);
             if (n != "missile") gameController.touchEnemy();
@@ -76,6 +77,6 @@ public class EnemyBehavior : MonoBehaviour
     }
     private void OnDestroy()
     {
-        // gameController.killEnemy();
+        gameController.killEnemy();
     }
 }

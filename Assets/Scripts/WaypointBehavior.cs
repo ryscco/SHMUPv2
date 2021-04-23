@@ -12,8 +12,10 @@ public class WaypointBehavior : MonoBehaviour
     public int wpHealth = 4;
     private float immuneTime;
     public bool isImmune;
+    public CameraSupport camSupp;
     void Start()
     {
+        camSupp = Camera.main.GetComponent<CameraSupport>();
         isImmune = true;
         immuneTime = Time.time + 1f;
         theGameController = FindObjectOfType<GameController>();
@@ -34,6 +36,10 @@ public class WaypointBehavior : MonoBehaviour
             // wpAnim.SetBool("killed", true);
             // Destroy(gameObject, 0.75f);
         }
+        if (!(camSupp.isInside(gameObject.GetComponent<SpriteRenderer>().bounds)))
+        {
+            relocateSelf();
+        }
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -41,9 +47,7 @@ public class WaypointBehavior : MonoBehaviour
         {
             if (other.gameObject.name == "playerShip" || other.gameObject.tag == "missile" && GetComponent<SpriteRenderer>().enabled)
             {
-                relocateSelf();
-                // wpAnim.SetBool("killed", true);
-                // Destroy(gameObject, 0.75f);
+                waypointDestroy();
             }
             if (other.gameObject.tag == "projectile")
             {
@@ -54,19 +58,23 @@ public class WaypointBehavior : MonoBehaviour
     }
     private void relocateSelf()
     {
+        wpAnim.SetBool("killed", false);
         Vector3 pos = transform.localPosition;
         pos.x = (transform.localPosition.x + Random.Range(-0.75f, 0.75f));
         pos.y = (transform.localPosition.y + Random.Range(-0.75f, 0.75f));
         pos.z = 0;
         transform.localPosition = pos;
-        wpAnim.SetBool("killed", true);
-        wpAnim.SetBool("killed", false);
         immuneTime = Time.time + 1f;
         isImmune = true;
         wpHealth = 4;
         theGameController.wps = GameObject.FindGameObjectsWithTag("waypoint");
     }
-    public void toggleVis() {
+    public void toggleVis()
+    {
         GetComponent<SpriteRenderer>().enabled = !(GetComponent<SpriteRenderer>().enabled);
+    }
+    void waypointDestroy() {
+        wpAnim.SetBool("killed", true);
+        Invoke("relocateSelf", 0.75f);
     }
 }

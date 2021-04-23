@@ -146,6 +146,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f45f844b6306994fa71a32383364018, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyAnimator: {fileID: 0}
+  gameController: {fileID: 0}
+  patrolType: 0
+  enemySpeed: 2.5
 --- !u!95 &7105820114690225685
 Animator:
   serializedVersion: 3

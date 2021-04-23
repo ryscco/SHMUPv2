@@ -64,7 +64,7 @@ public class playerBehavior : MonoBehaviour
 
         Vector3 pos = transform.position;
 
-        if (controlScheme) // Default scheme is player locked to mouse
+        if (controlScheme && theGameController.GetComponent<GameController>().isGameRunning()) // Default scheme is player locked to mouse
         {
             pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             pos.z = 0f;
@@ -213,6 +213,7 @@ public class playerBehavior : MonoBehaviour
     public void playerExplode()
     {
         playerAnimator.SetBool("killed", true);
+        Invoke("makeInactiveDelay", 0.75f);
     }
     public void playerHealthTopOff()
     {
@@ -221,5 +222,8 @@ public class playerBehavior : MonoBehaviour
     public void activateShield()
     {
         shield.SetActive(true);
+    }
+    void makeInactiveDelay() {
+        gameObject.SetActive(false);
     }
 }

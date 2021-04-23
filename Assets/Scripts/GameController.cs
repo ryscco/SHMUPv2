@@ -40,11 +40,14 @@ public class GameController : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        pickupChance = Random.Range(0.0f, 10.0f);
-        if (pickupChance > 9.0f && !(GameObject.FindGameObjectWithTag("pickup")) && Time.time > nextPickupTime && gameRunning)
+        if (gameRunning)
         {
-            instantiatePickup();
-            nextPickupTime = Time.time + pickupCooldownTime;
+            pickupChance = Random.Range(0.0f, 10.0f);
+            if (pickupChance > 9.0f && !(GameObject.FindGameObjectWithTag("pickup")) && Time.time > nextPickupTime)
+            {
+                instantiatePickup();
+                nextPickupTime = Time.time + pickupCooldownTime;
+            }
         }
     }
     void Update()
@@ -75,19 +78,23 @@ public class GameController : MonoBehaviour
         {
             ShowControls();
         }
-        if (Input.GetKeyDown(KeyCode.H) && gameRunning) {
+        if (Input.GetKeyDown(KeyCode.H) && gameRunning)
+        {
             foreach (GameObject w in wps)
             {
                 w.GetComponent<WaypointBehavior>().toggleVis();
             }
-        } 
+        }
         if (playerLives <= 0)
         {
             playerDie();
         }
-        wps = GameObject.FindGameObjectsWithTag("waypoint");
-        numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
-        numberOfWaypoints = wps.Length;
+        if (gameRunning)
+        {
+            wps = GameObject.FindGameObjectsWithTag("waypoint");
+            numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
+            numberOfWaypoints = wps.Length;
+        }
         // Instantiate enemies
         if (numberOfEnemies < maxEnemies && gameRunning)
         {
@@ -138,7 +145,7 @@ public class GameController : MonoBehaviour
     }
     public void instantiateWaypoints()
     {
-        while (GameObject.FindGameObjectsWithTag("waypoint").Length < maxWaypoints)
+        while (GameObject.FindGameObjectsWithTag("waypoint").Length < maxWaypoints && gameRunning)
         {
             CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
             GameObject waypoint = Instantiate(Resources.Load("Prefabs/waypoint") as GameObject);
@@ -169,13 +176,13 @@ public class GameController : MonoBehaviour
     public void playerDie()
     {
         player.gameObject.GetComponent<playerBehavior>().playerExplode();
-        Destroy(player, 0.75f);
+        // Destroy(player, 0.75f);
         Cursor.visible = true;
         reloadButton.SetActive(true);
         quitButton.SetActive(true);
         gameOverText.SetActive(true);
         gameRunning = false;
-        player.SetActive(false);
+        // player.SetActive(false);
     }
     private void ReloadGame()
     {
@@ -211,5 +218,9 @@ public class GameController : MonoBehaviour
         pos.z = 0;
         waypoint.transform.localPosition = pos;
         waypoint.name = name;
+    }
+    public bool isGameRunning()
+    {
+        return gameRunning;
     }
 }
