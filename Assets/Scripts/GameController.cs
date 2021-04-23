@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
     private float nextPickupTime = 0f;
     private float pickupCooldownTime = 15f;
     GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton, controlsPanel;
+    public GameObject[] wps = null;
     void Start()
     {
         Cursor.visible = true;
@@ -48,6 +49,20 @@ public class GameController : MonoBehaviour
     }
     void Update()
     {
+        // Title/GameOver button behavior
+        if (startButton.activeSelf)
+        {
+            startButton.GetComponent<Button>().onClick.AddListener(StartGame);
+            startButton.GetComponent<Button>().onClick.AddListener(instantiateWaypoints);
+        }
+        if (reloadButton.activeSelf)
+        {
+            reloadButton.GetComponent<Button>().onClick.AddListener(ReloadGame);
+        }
+        if (quitButton.activeSelf)
+        {
+            quitButton.GetComponent<Button>().onClick.AddListener(QuitGame);
+        }
         if (Input.GetKeyDown(KeyCode.C))
         {
             Cursor.visible = !(Cursor.visible);
@@ -60,12 +75,19 @@ public class GameController : MonoBehaviour
         {
             ShowControls();
         }
+        if (Input.GetKeyDown(KeyCode.H) && gameRunning) {
+            foreach (GameObject w in wps)
+            {
+                w.GetComponent<WaypointBehavior>().toggleVis();
+            }
+        } 
         if (playerLives <= 0)
         {
             playerDie();
         }
+        wps = GameObject.FindGameObjectsWithTag("waypoint");
         numberOfEnemies = (GameObject.FindGameObjectsWithTag("Enemy").Length);
-        numberOfWaypoints = (GameObject.FindGameObjectsWithTag("waypoint").Length);
+        numberOfWaypoints = wps.Length;
         // Instantiate enemies
         if (numberOfEnemies < maxEnemies && gameRunning)
         {
@@ -81,20 +103,6 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             instantiatePickup();
-        }
-        // Title/GameOver button behavior
-        if (startButton.activeSelf)
-        {
-            startButton.GetComponent<Button>().onClick.AddListener(StartGame);
-            startButton.GetComponent<Button>().onClick.AddListener(instantiateWaypoints);
-        }
-        if (reloadButton.activeSelf)
-        {
-            reloadButton.GetComponent<Button>().onClick.AddListener(ReloadGame);
-        }
-        if (quitButton.activeSelf)
-        {
-            quitButton.GetComponent<Button>().onClick.AddListener(QuitGame);
         }
     }
     public void killEnemy()
@@ -126,7 +134,7 @@ public class GameController : MonoBehaviour
     }
     public void pickupShield()
     {
-
+        player.gameObject.GetComponent<playerBehavior>().activateShield();
     }
     public void instantiateWaypoints()
     {
@@ -140,11 +148,13 @@ public class GameController : MonoBehaviour
             pos.z = 0;
             waypoint.transform.localPosition = pos;
         }
-        string[] wpNames = {"A", "B", "C", "D", "E", "F"};
+        string[] wpNames = { "A", "B", "C", "D", "E", "F" };
         GameObject[] wpArray = GameObject.FindGameObjectsWithTag("waypoint");
-        for (int i = 0; i < GameObject.FindGameObjectsWithTag("waypoint").Length; i++) {
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("waypoint").Length; i++)
+        {
             wpArray[i].name = "waypoint" + wpNames[i];
         }
+        wps = wpArray;
     }
     public void instantiatePickup()
     {
@@ -165,6 +175,7 @@ public class GameController : MonoBehaviour
         quitButton.SetActive(true);
         gameOverText.SetActive(true);
         gameRunning = false;
+        player.SetActive(false);
     }
     private void ReloadGame()
     {
@@ -195,8 +206,8 @@ public class GameController : MonoBehaviour
         CameraSupport camSupp = Camera.main.GetComponent<CameraSupport>();
         GameObject waypoint = Instantiate(Resources.Load("Prefabs/waypoint") as GameObject);
         Vector3 pos;
-        pos.x = (xform.position.x + Random.Range(-0.15f,0.15f));
-        pos.y = (xform.position.y + Random.Range(-0.15f,0.15f));
+        pos.x = (xform.position.x + Random.Range(-0.75f, 0.75f));
+        pos.y = (xform.position.y + Random.Range(-0.75f, 0.75f));
         pos.z = 0;
         waypoint.transform.localPosition = pos;
         waypoint.name = name;

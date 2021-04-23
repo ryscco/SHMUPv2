@@ -9,7 +9,7 @@ TagManager:
   - Enemy
   - waypoint
   - pickup
-  - waypointA
+  - shield
   layers:
   - Default
   - TransparentFX

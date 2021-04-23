@@ -9,17 +9,18 @@ public class EnemyBehavior : MonoBehaviour
     public GameController gameController = null;
     Color color;
     public char patrolType; // A (waypoints in order) or B (random waypoints)
+    public float enemySpeed = 0.1f;
+    GameObject[] wps;
+    int wpIndex;
+    float wpRadius;
     void Start()
     {
+        wpIndex = Random.Range(0, 5);
+        wps = GameObject.FindGameObjectsWithTag("waypoint");
+        wpRadius = wps[0].GetComponent<SpriteRenderer>().size.x / 2;
         // Set patrol type on creation randomly between A and B
-        if (Random.value < 0.5f)
-        {
-            patrolType = 'A';
-        }
-        else
-        {
-            patrolType = 'B';
-        }
+        if (Random.value < 0.5f) patrolType = 'A';
+        else patrolType = 'B';
         enemyAnimator = GetComponent<Animator>();
         color = GetComponent<SpriteRenderer>().material.color;
         gameController = FindObjectOfType<GameController>();
@@ -34,28 +35,47 @@ public class EnemyBehavior : MonoBehaviour
             enemyAnimator.SetBool("killed", true);
             Destroy(gameObject, 0.75f);
         }
+
+        if (Vector3.Distance(wps[wpIndex].transform.position, transform.position) < wpRadius)
+        {
+            if (patrolType == 'A')
+            {
+                wpIndex++;
+                if (wpIndex >= wps.Length)
+                {
+                    wpIndex = 0;
+                }
+            }
+            else
+            {
+                int rand = Random.Range(0,5);
+                if (rand != wpIndex) {
+                    wpIndex = rand;
+                }
+                else {
+                    wpIndex++;
+                }
+            }
+        }
+        transform.position = Vector3.MoveTowards(transform.position, wps[wpIndex].transform.position, Time.deltaTime * enemySpeed);
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.name == "playerShip")
+        string n = other.gameObject.tag;
+        if (n == "Player" || n == "missile" || n == "shield")
         {
             enemyAnimator.SetBool("killed", true);
             Destroy(gameObject, 0.75f);
-            gameController.touchEnemy();
+            if (n != "missile") gameController.touchEnemy();
         }
-        if (other.gameObject.tag == "projectile")
+        else if (n == "projectile")
         {
             --hitsRemaining;
             color.a = GetComponent<SpriteRenderer>().material.color.a * 0.8f;
         }
-        if (other.gameObject.tag == "missile")
-        {
-            enemyAnimator.SetBool("killed", true);
-            Destroy(gameObject, 0.75f);
-        }
     }
     private void OnDestroy()
     {
-        gameController.killEnemy();
+        // gameController.killEnemy();
     }
 }

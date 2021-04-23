@@ -8,6 +8,7 @@ public class playerBehavior : MonoBehaviour
     public Rigidbody2D playerRB2D;
     public Vector3 bulletSpawnPoint;
     public Vector3 missileSpawnPoint;
+    public GameObject shield;
     public float playerHealthCurrent;
     public float playerHealthMax = 10.0f;
     public float playerSpeed = 3.5f;
@@ -26,6 +27,8 @@ public class playerBehavior : MonoBehaviour
     private float spriteSizeY = 0;
     void Start()
     {
+        shield = GameObject.Find("shield");
+        shield.SetActive(false);
         playerAnimator = GetComponent<Animator>();
         playerRB2D = GetComponent<Rigidbody2D>();
         bulletSpawnPoint.y = 0.4f;
@@ -195,13 +198,16 @@ public class playerBehavior : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Enemy")
+        if (shield.activeSelf == false)
         {
-            playerHealthCurrent -= Random.Range(1.0f, 2.5f);
-        }
-        if (other.gameObject.tag == "waypoint")
-        {
-            playerHealthCurrent -= Random.Range(0.5f, 1.5f);
+            if (other.gameObject.tag == "Enemy")
+            {
+                playerHealthCurrent -= Random.Range(1.0f, 2.5f);
+            }
+            if (other.gameObject.tag == "waypoint" && !(other.gameObject.GetComponent<WaypointBehavior>().isImmune))
+            {
+                playerHealthCurrent -= Random.Range(0.5f, 1.5f);
+            }
         }
     }
     public void playerExplode()
@@ -211,5 +217,9 @@ public class playerBehavior : MonoBehaviour
     public void playerHealthTopOff()
     {
         playerHealthCurrent = playerHealthMax;
+    }
+    public void activateShield()
+    {
+        shield.SetActive(true);
     }
 }
