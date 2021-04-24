@@ -28,14 +28,6 @@ public class WaypointBehavior : MonoBehaviour
     {
         if (Time.time > immuneTime) isImmune = false;
         gameObject.GetComponent<SpriteRenderer>().material.color = color;
-        if (wpHealth < 1)
-        {
-            color.a = 1f;
-            gameObject.GetComponent<SpriteRenderer>().material.color = color;
-            relocateSelf();
-            // wpAnim.SetBool("killed", true);
-            // Destroy(gameObject, 0.75f);
-        }
         if (!(camSupp.isInside(gameObject.GetComponent<SpriteRenderer>().bounds)))
         {
             relocateSelf();
@@ -51,8 +43,14 @@ public class WaypointBehavior : MonoBehaviour
             }
             if (other.gameObject.tag == "projectile")
             {
-                --wpHealth;
+                wpHealth--;
                 color.a = GetComponent<SpriteRenderer>().material.color.a - 0.25f;
+                if (wpHealth < 1)
+                {
+                    color.a = 1f;
+                    gameObject.GetComponent<SpriteRenderer>().material.color = color;
+                    waypointDestroy();
+                }
             }
         }
     }
@@ -73,8 +71,10 @@ public class WaypointBehavior : MonoBehaviour
     {
         GetComponent<SpriteRenderer>().enabled = !(GetComponent<SpriteRenderer>().enabled);
     }
-    void waypointDestroy() {
+    void waypointDestroy()
+    {
         wpAnim.SetBool("killed", true);
+        theGameController.sfxExplosion.Play();
         Invoke("relocateSelf", 0.75f);
     }
 }

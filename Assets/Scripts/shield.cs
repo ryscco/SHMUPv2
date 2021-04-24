@@ -19,8 +19,11 @@ public class shield : MonoBehaviour
         if (other.gameObject.tag == "Enemy" || other.gameObject.tag == "waypoint") {
             shieldCurrent -= Random.Range(0.5f,1.0f);
         }
-        if (other.gameObject.tag == "enemyProjectile") {
+        else if (other.gameObject.tag == "enemyProjectile") {
             shieldCurrent -= Random.Range(0.2f,0.5f);
+        }
+        else {
+            
         }
     }
 }

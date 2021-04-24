@@ -9,6 +9,7 @@ public class playerBehavior : MonoBehaviour
     public Vector3 bulletSpawnPoint;
     public Vector3 missileSpawnPoint;
     public GameObject shield;
+    // public AudioSource sfxPickup;
     public float playerHealthCurrent;
     public float playerHealthMax = 10.0f;
     public float playerSpeed = 3.5f;
@@ -25,6 +26,9 @@ public class playerBehavior : MonoBehaviour
     private GameController theGameController = null;
     private float spriteSizeX = 0;
     private float spriteSizeY = 0;
+    public bool turboEnabled;
+    public float turboTime;
+    public float shootCooldown;
     void Start()
     {
         shield = GameObject.Find("shield");
@@ -36,9 +40,15 @@ public class playerBehavior : MonoBehaviour
         spriteSizeX = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
         spriteSizeY = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
         playerHealthCurrent = playerHealthMax;
+        turboEnabled = false;
     }
     void Update()
     {
+        if (nextFireTime > Time.time)
+        {
+            shootCooldown = nextFireTime - Time.time;
+        }
+        else shootCooldown = 0;
         // Randomize which side missiles spawn from
         if (Random.value < 0.5f)
         {
@@ -118,7 +128,6 @@ public class playerBehavior : MonoBehaviour
             {
                 playerAnimator.SetBool("strafing", false);
             }
-
             // Decelerate player when movement keys aren't held
             if ((playerSpeed > 3.5) && !(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
             {
@@ -126,6 +135,11 @@ public class playerBehavior : MonoBehaviour
             }
             pos = CheckEdges(pos);
         }
+
+        // TURBO
+        if (turboEnabled) shootCooldownTime = shootCooldownTime / 2;
+        else shootCooldownTime = 0.2f;
+
         // Constrain fire rate
         if (Time.time > nextFireTime)
         {
@@ -133,12 +147,19 @@ public class playerBehavior : MonoBehaviour
             {
                 shootCooldownToggle = false;
             }
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space) && !(playerHasMissile) || turboEnabled)
             {
                 GameObject projectileA = Instantiate(Resources.Load("Prefabs/playerProjectileA") as GameObject);
                 projectileA.transform.localPosition = transform.localPosition + bulletSpawnPoint;
                 projectileA.transform.rotation = transform.rotation;
                 nextFireTime = Time.time + shootCooldownTime;
+                theGameController.sfxLaser.Play();
+                if (Time.time > turboTime && turboEnabled)
+                {
+                    turboEnabled = false;
+                    theGameController.turboReady = false;
+                    GameObject.Find("tButton").SetActive(false);
+                }
             }
         }
         // Constrain missile fire rate & check existence
@@ -208,6 +229,14 @@ public class playerBehavior : MonoBehaviour
             {
                 playerHealthCurrent -= Random.Range(0.5f, 1.5f);
             }
+            if (other.gameObject.tag == "pickup")
+            {
+                theGameController.GetComponent<GameController>().sfxPickup.Play();
+            }
+            if (other.gameObject.tag == "enemyProjectile")
+            {
+                playerHealthCurrent -= Random.Range(0.2f, 0.5f);
+            }
         }
     }
     public void playerExplode()
@@ -223,7 +252,8 @@ public class playerBehavior : MonoBehaviour
     {
         shield.SetActive(true);
     }
-    void makeInactiveDelay() {
+    void makeInactiveDelay()
+    {
         gameObject.SetActive(false);
     }
 }

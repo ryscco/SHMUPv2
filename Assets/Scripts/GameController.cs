@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
-    private bool gameRunning;
+    private bool gameRunning = false;
     private int maxEnemies = 10;
     private int numberOfEnemies = 0;
     private int maxWaypoints = 6;
@@ -17,13 +18,22 @@ public class GameController : MonoBehaviour
     private float pickupChance;
     private float nextPickupTime = 0f;
     private float pickupCooldownTime = 15f;
-    GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton, controlsPanel, missileReadyMsg;
+    bool forceEnemyPatrolType = false;
+    GameObject bButton, tButton, player, reloadButton, gameOverText, quitButton, titleText, startButton, controlsPanel, missileReadyMsg, evalPanel;
     public GameObject[] wps = null;
+    public GameObject textScore;
+    public AudioSource sfxPickup, sfxLaser, sfxExplosion;
+    public bool turboReady = false;
+    public int score = 0;
+    string textEP = "";
     void Start()
     {
         Cursor.visible = true;
 
+        evalPanel = GameObject.Find("evalPanel");
+        textScore = GameObject.Find("scoreNum");
         bButton = GameObject.Find("bButton");
+        tButton = GameObject.Find("tButton");
         player = GameObject.Find("playerShip");
         reloadButton = GameObject.Find("reloadButton");
         quitButton = GameObject.Find("quitButton");
@@ -32,13 +42,18 @@ public class GameController : MonoBehaviour
         startButton = GameObject.Find("startButton");
         controlsPanel = GameObject.Find("controlsPanel");
         missileReadyMsg = GameObject.Find("missileReadyMsg");
+        sfxPickup = GameObject.Find("sfxPickupSource").GetComponent<AudioSource>();
+        sfxLaser = GameObject.Find("sfxLaserSource").GetComponent<AudioSource>();
+        sfxExplosion = GameObject.Find("sfxExplosionSource").GetComponent<AudioSource>();
 
+        evalPanel.SetActive(false);
         player.SetActive(false);
         bButton.SetActive(false);
         reloadButton.SetActive(false);
         quitButton.SetActive(false);
         gameOverText.SetActive(false);
         missileReadyMsg.SetActive(false);
+        tButton.SetActive(false);
     }
     private void FixedUpdate()
     {
@@ -54,6 +69,16 @@ public class GameController : MonoBehaviour
     }
     void Update()
     {
+        if (evalPanel.activeSelf)
+        {
+            textEP = buildEPText();
+            evalPanel.GetComponentInChildren<Text>().text = textEP;
+        }
+        if (score >= 500 && score % 1000 == 0)
+        {
+            turboReady = true;
+        }
+        textScore.GetComponent<TMPro.TextMeshProUGUI>().text = (score + "");
         // Title/GameOver button behavior
         if (startButton.activeSelf)
         {
@@ -76,9 +101,17 @@ public class GameController : MonoBehaviour
         {
             QuitGame();
         }
+        if (Input.GetKeyDown(KeyCode.E) && gameRunning)
+        {
+            evalPanel.SetActive(!(evalPanel.activeSelf));
+        }
         if (Input.GetKeyDown(KeyCode.K) && gameRunning)
         {
             ShowControls();
+        }
+        if (Input.GetKeyDown(KeyCode.J) && gameRunning)
+        {
+            toggleEnemyPatrolType();
         }
         if (Input.GetKeyDown(KeyCode.H) && gameRunning)
         {
@@ -104,7 +137,8 @@ public class GameController : MonoBehaviour
             GameObject enemy = Instantiate(Resources.Load("Prefabs/enemyType1") as GameObject);
             Vector3 pos;
             pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
-            pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
+            pos.y = camSupp.GetWorldBound().max.y + Random.Range(0.5f, 1.0f);
+            // pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
             pos.z = 0;
             enemy.transform.localPosition = pos;
         }
@@ -113,10 +147,17 @@ public class GameController : MonoBehaviour
         {
             instantiatePickup();
         }
+        if (turboReady) tButton.SetActive(true);
+        if (Input.GetKeyDown(KeyCode.T) && turboReady)
+        {
+            player.GetComponent<playerBehavior>().turboEnabled = true;
+            player.GetComponent<playerBehavior>().turboTime = Time.time + 5f;
+        }
     }
     public void killEnemy()
     {
         numberOfEnemiesKilled += 1;
+        score += 25;
     }
     public void touchEnemy()
     {
@@ -133,10 +174,14 @@ public class GameController : MonoBehaviour
     }
     public void pickupMissile()
     {
-        bButton.SetActive(true);
-        missileReadyMessage();
-        player.gameObject.GetComponent<playerBehavior>().playerHasMissile = true;
-        Invoke("missileReadyMessage", 0.5f);
+        if (!(player.gameObject.GetComponent<playerBehavior>().playerHasMissile))
+        {
+            bButton.SetActive(true);
+            missileReadyMessage();
+            player.gameObject.GetComponent<playerBehavior>().playerHasMissile = true;
+            Invoke("missileReadyMessage", 0.5f);
+        }
+
     }
     public void shootMissile()
     {
@@ -155,7 +200,7 @@ public class GameController : MonoBehaviour
             GameObject waypoint = Instantiate(Resources.Load("Prefabs/waypoint") as GameObject);
             Vector3 pos;
             pos.x = (camSupp.GetWorldBound().min.x + Random.value * camSupp.GetWorldBound().size.x) * 0.9f;
-            pos.y = (camSupp.GetWorldBound().min.y + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
+            pos.y = ((camSupp.GetWorldBound().min.y + 1f) + Random.value * camSupp.GetWorldBound().size.y) * 0.9f;
             pos.z = 0;
             waypoint.transform.localPosition = pos;
         }
@@ -240,5 +285,40 @@ public class GameController : MonoBehaviour
     void missileReadyMessage()
     {
         missileReadyMsg.SetActive(!(missileReadyMsg.activeSelf));
+    }
+    void toggleEnemyPatrolType()
+    {
+        char type = ' ';
+        if (forceEnemyPatrolType)
+        {
+            type = 'A';
+        }
+        else
+        {
+            type = 'B';
+        }
+        foreach (GameObject e in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            e.GetComponent<EnemyBehavior>().patrolType = type;
+        }
+        forceEnemyPatrolType = !forceEnemyPatrolType;
+    }
+    string buildEPText()
+    {
+        string text = "";
+        text += "Control mode: ";
+        if (player.GetComponent<playerBehavior>().controlScheme)
+        {
+            text += "mouse";
+        }
+        else text += "keyboard";
+        text += "\n";
+        text += "Enemies killed: " + numberOfEnemiesKilled + "\n";
+        text += "Enemies touched: " + numberOfEnemiesTouched + "\n";
+        text += "Waypoints: " + numberOfWaypoints + "\n";
+        text += "Enemies alive: " + numberOfEnemies + "\n";
+        text += "Bullet cooldown: " + player.GetComponent<playerBehavior>().shootCooldown + "\n";
+        text += "Bullets in world: " + GameObject.FindGameObjectsWithTag("projectile").Length + "\n";
+        return text;
     }
 }

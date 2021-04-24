@@ -21,14 +21,14 @@ public class pickupBehavior : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" || other.gameObject.tag == "shield")
         {
             float pickupDetermine = Random.value;
-            if (pickupDetermine <= 0.65f)
+            if (pickupDetermine <= 0.60f)
             {
                 theGameController.pickupMissile();
             }
-            else if (pickupDetermine > 0.65f && pickupDetermine <= 0.9f)
+            else if (pickupDetermine > 0.60f && pickupDetermine <= 0.9f)
             {
                 theGameController.pickupShield();
             }
@@ -46,7 +46,11 @@ public class pickupBehavior : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    private void OnBecameInvisible() {
+    private void OnBecameInvisible()
+    {
         Destroy(gameObject);
+    }
+    private void OnDestroy() {
+        
     }
 }
