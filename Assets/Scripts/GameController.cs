@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour
     private float pickupChance;
     private float nextPickupTime = 0f;
     private float pickupCooldownTime = 15f;
-    GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton, controlsPanel;
+    GameObject bButton, player, reloadButton, gameOverText, quitButton, titleText, startButton, controlsPanel, missileReadyMsg;
     public GameObject[] wps = null;
     void Start()
     {
@@ -31,12 +31,14 @@ public class GameController : MonoBehaviour
         titleText = GameObject.Find("titleText");
         startButton = GameObject.Find("startButton");
         controlsPanel = GameObject.Find("controlsPanel");
+        missileReadyMsg = GameObject.Find("missileReadyMsg");
 
         player.SetActive(false);
         bButton.SetActive(false);
         reloadButton.SetActive(false);
         quitButton.SetActive(false);
         gameOverText.SetActive(false);
+        missileReadyMsg.SetActive(false);
     }
     private void FixedUpdate()
     {
@@ -132,7 +134,9 @@ public class GameController : MonoBehaviour
     public void pickupMissile()
     {
         bButton.SetActive(true);
+        missileReadyMessage();
         player.gameObject.GetComponent<playerBehavior>().playerHasMissile = true;
+        Invoke("missileReadyMessage", 0.5f);
     }
     public void shootMissile()
     {
@@ -176,13 +180,12 @@ public class GameController : MonoBehaviour
     public void playerDie()
     {
         player.gameObject.GetComponent<playerBehavior>().playerExplode();
-        // Destroy(player, 0.75f);
         Cursor.visible = true;
         reloadButton.SetActive(true);
         quitButton.SetActive(true);
         gameOverText.SetActive(true);
         gameRunning = false;
-        // player.SetActive(false);
+        gameOver();
     }
     private void ReloadGame()
     {
@@ -222,5 +225,20 @@ public class GameController : MonoBehaviour
     public bool isGameRunning()
     {
         return gameRunning;
+    }
+    void gameOver()
+    {
+        foreach (GameObject e in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            Destroy(e);
+        }
+        foreach (GameObject w in GameObject.FindGameObjectsWithTag("waypoint"))
+        {
+            Destroy(w);
+        }
+    }
+    void missileReadyMessage()
+    {
+        missileReadyMsg.SetActive(!(missileReadyMsg.activeSelf));
     }
 }

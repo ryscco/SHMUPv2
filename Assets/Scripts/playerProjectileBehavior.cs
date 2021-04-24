@@ -22,6 +22,7 @@ public class playerProjectileBehavior : MonoBehaviour
         if (gameObject.CompareTag("missile"))
         {
             projectileSpeed += 0.1f;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, enemies[missileTarget].transform.rotation, 90f);
             transform.position = Vector3.MoveTowards(transform.position, enemies[missileTarget].transform.position, Time.deltaTime * projectileSpeed);
             if (transform.position == enemies[missileTarget].transform.position) Destroy(gameObject);
         }

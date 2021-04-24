@@ -8,12 +8,13 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 867502246460635396}
+  - component: {fileID: 184339094021254574}
   - component: {fileID: 3747679066940546865}
   - component: {fileID: 5914586144031934911}
   - component: {fileID: 8912487423559552324}
   - component: {fileID: 1630645073597985044}
   - component: {fileID: 7105820114690225685}
+  - component: {fileID: 5440743486135932088}
   m_Layer: 0
   m_Name: enemyType1
   m_TagString: Enemy
@@ -21,8 +22,8 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &867502246460635396
-Transform:
+--- !u!224 &184339094021254574
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -35,6 +36,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0.64, y: 0.64}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &3747679066940546865
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -150,6 +156,7 @@ MonoBehaviour:
   gameController: {fileID: 0}
   patrolType: 0
   enemySpeed: 2.5
+  wpIndex: 0
 --- !u!95 &7105820114690225685
 Animator:
   serializedVersion: 3
@@ -169,3 +176,11 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!222 &5440743486135932088
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7247537744758107439}
+  m_CullTransparentMesh: 1

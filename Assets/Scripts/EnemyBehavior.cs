@@ -11,7 +11,7 @@ public class EnemyBehavior : MonoBehaviour
     public char patrolType; // A (waypoints in order) or B (random waypoints)
     public float enemySpeed = 2.5f;
     GameObject[] wps;
-    int wpIndex;
+    public int wpIndex; // This enemy's next waypoint destination
     float wpRadius;
     void Start()
     {

@@ -8,7 +8,7 @@ public class WaypointBehavior : MonoBehaviour
     private Animator wpAnim;
     private Transform prevPos;
     private Color color;
-    public string wpName;
+    public string waypointName;
     public int wpHealth = 4;
     private float immuneTime;
     public bool isImmune;
@@ -21,7 +21,7 @@ public class WaypointBehavior : MonoBehaviour
         theGameController = FindObjectOfType<GameController>();
         wpAnim = gameObject.GetComponent<Animator>();
         prevPos = transform;
-        wpName = gameObject.name;
+        waypointName = gameObject.name;
         color = new Color(1f, 1f, 1f, 1f);
     }
     void Update()
@@ -43,7 +43,7 @@ public class WaypointBehavior : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (Time.time > (immuneTime + 1f))
+        if (Time.time > (immuneTime + 1f) && GetComponent<SpriteRenderer>().enabled)
         {
             if (other.gameObject.name == "playerShip" || other.gameObject.tag == "missile" && GetComponent<SpriteRenderer>().enabled)
             {
