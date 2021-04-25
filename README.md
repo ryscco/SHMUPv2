@@ -1,7 +1,7 @@
 # SHMUPv2
+This projected was completed by Ryan C as an assignment for UWB CSS 385.
 - Monitors 1080p and lower: [PLAY ⧉](https://ryscco.github.io/SHMUPv2/build1080/)
 - Monitors higher than 1080p: [PLAY ⧉](https://ryscco.github.io/SHMUPv2/build1440/)
-This projected was completed by Ryan C as an assignment for UWB CSS 385.
 ## Controls & Gameplay
 ### Movement controls
 - Movement, by default, is with the *mouse*. Press **M** to toggle between mouse- and keyboard-controlled movement.
